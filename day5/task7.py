@@ -13,6 +13,10 @@ class LowBalanceError(Exception):
     pass
 
 
+class WithdrawalLimitError(Exception):
+    pass
+
+
 correct_pin = 1234
 balance = 5000
 
@@ -20,9 +24,6 @@ print("WELCOME TO PYTHON ATM")
 
 now = datetime.datetime.now()
 print("Date and Time:", now.strftime("%d-%m-%Y %H:%M:%S"))
-
-trans_id = random.randint(1000, 9999)
-print("Transaction ID:", trans_id)
 
 pin_tries = 0
 pin_ok = False
@@ -69,13 +70,29 @@ while True:
                 print("Amount must be greater than 0")
                 continue
 
+            if amt > 10000:
+                raise WithdrawalLimitError("Maximum withdrawal amount reached")
+
+            otp = random.randint(1000, 9999)
+            print("your OTP is:", otp)
+
+            users_otp = int(input("enter your OTP: "))
+
+            if users_otp != otp:
+                print("Invalid OTP")
+                continue
+
             amt = math.ceil(amt)
 
             if amt > balance:
                 raise LowBalanceError("Insufficient Balance")
 
             balance -= amt
+
             print("Withdrawal Successful")
+
+        except WithdrawalLimitError as e:
+            print(e)
 
         except LowBalanceError as e:
             print(e)
@@ -111,6 +128,10 @@ while True:
     elif choice == "4":
         print("Thank You For Using ATM")
         print("Session Ended At:", datetime.datetime.now().strftime("%H:%M:%S"))
+
+        trans_id = random.randint(1000, 9999)
+        print("Transaction ID:", trans_id)
+
         break
 
     else:
